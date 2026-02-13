@@ -7,6 +7,7 @@ import { Badge } from "../components/ui/badge";
 
 // Lead Page 3: Early Access / Beta Program - 抢先体验页
 export function LeadPage3() {
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [twitter, setTwitter] = useState("");
   const [reason, setReason] = useState("");
@@ -18,14 +19,14 @@ export function LeadPage3() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (email) {
+    if (email && name) {
       setIsSubmitting(true);
       try {
         await fetch("https://script.google.com/macros/s/AKfycbwtrUkPkBDsEUXZueYLN4NhwrWiGIhHLtO92EXWJMiX2W5uVKw9IaeJ7XpSDbnnWppFcg/exec", {
           method: "POST",
           mode: "no-cors",
           body: JSON.stringify({
-            name: email,
+            name,
             email,
             source: "lead-page-3-early-access",
           }),
@@ -225,6 +226,20 @@ export function LeadPage3() {
               </div>
 
               <form onSubmit={handleSubmit} className="space-y-4">
+                <div>
+                  <label htmlFor="name" className="block text-sm font-medium mb-2">
+                    Full Name *
+                  </label>
+                  <Input
+                    id="name"
+                    type="text"
+                    placeholder="Dr. Jane Smith"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    required
+                  />
+                </div>
+
                 <div>
                   <label htmlFor="email" className="block text-sm font-medium mb-2">
                     Email Address *
