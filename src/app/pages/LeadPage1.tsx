@@ -10,12 +10,28 @@ export function LeadPage1() {
   const [name, setName] = useState("");
   const [institution, setInstitution] = useState("");
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (email && name) {
-      // Simulate submission
-      setIsSubmitted(true);
+      setIsSubmitting(true);
+      try {
+        await fetch("https://script.google.com/macros/s/AKfycbwtrUkPkBDsEUXZueYLN4NhwrWiGIhHLtO92EXWJMiX2W5uVKw9IaeJ7XpSDbnnWppFcg/exec", {
+          method: "POST",
+          mode: "no-cors",
+          body: JSON.stringify({
+            name,
+            email,
+            source: "lead-page-1-free-trial",
+          }),
+        });
+        setIsSubmitted(true);
+      } catch {
+        setIsSubmitted(true);
+      } finally {
+        setIsSubmitting(false);
+      }
     }
   };
 
@@ -191,10 +207,11 @@ export function LeadPage1() {
 
               <Button
                 type="submit"
+                disabled={isSubmitting}
                 className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 h-12 text-lg"
               >
-                Get Free Access Now
-                <ArrowRight className="w-5 h-5 ml-2" />
+                {isSubmitting ? "Submitting..." : "Get Free Access Now"}
+                {!isSubmitting && <ArrowRight className="w-5 h-5 ml-2" />}
               </Button>
             </form>
 

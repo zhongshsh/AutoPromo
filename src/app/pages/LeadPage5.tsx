@@ -14,11 +14,28 @@ export function LeadPage5() {
     currentFollowers: "",
   });
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (formData.email && formData.name) {
-      setIsSubmitted(true);
+      setIsSubmitting(true);
+      try {
+        await fetch("https://script.google.com/macros/s/AKfycbwtrUkPkBDsEUXZueYLN4NhwrWiGIhHLtO92EXWJMiX2W5uVKw9IaeJ7XpSDbnnWppFcg/exec", {
+          method: "POST",
+          mode: "no-cors",
+          body: JSON.stringify({
+            name: formData.name,
+            email: formData.email,
+            source: "lead-page-5-growth",
+          }),
+        });
+        setIsSubmitted(true);
+      } catch {
+        setIsSubmitted(true);
+      } finally {
+        setIsSubmitting(false);
+      }
     }
   };
 
@@ -353,10 +370,11 @@ export function LeadPage5() {
 
               <Button
                 type="submit"
+                disabled={isSubmitting}
                 className="w-full bg-gradient-to-r from-pink-600 to-orange-600 hover:from-pink-700 hover:to-orange-700 h-12 text-lg"
               >
-                Get Free Growth Package
-                <ArrowRight className="w-5 h-5 ml-2" />
+                {isSubmitting ? "Submitting..." : "Get Free Growth Package"}
+                {!isSubmitting && <ArrowRight className="w-5 h-5 ml-2" />}
               </Button>
             </form>
 

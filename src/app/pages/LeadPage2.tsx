@@ -16,11 +16,28 @@ export function LeadPage2() {
     needs: "",
   });
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (formData.email && formData.name && formData.institution) {
-      setIsSubmitted(true);
+      setIsSubmitting(true);
+      try {
+        await fetch("https://script.google.com/macros/s/AKfycbwtrUkPkBDsEUXZueYLN4NhwrWiGIhHLtO92EXWJMiX2W5uVKw9IaeJ7XpSDbnnWppFcg/exec", {
+          method: "POST",
+          mode: "no-cors",
+          body: JSON.stringify({
+            name: formData.name,
+            email: formData.email,
+            source: "lead-page-2-enterprise",
+          }),
+        });
+        setIsSubmitted(true);
+      } catch {
+        setIsSubmitted(true);
+      } finally {
+        setIsSubmitting(false);
+      }
     }
   };
 
@@ -290,10 +307,11 @@ export function LeadPage2() {
 
               <Button
                 type="submit"
+                disabled={isSubmitting}
                 className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 h-12 text-lg"
               >
-                Request Demo & Pricing
-                <ArrowRight className="w-5 h-5 ml-2" />
+                {isSubmitting ? "Submitting..." : "Request Demo & Pricing"}
+                {!isSubmitting && <ArrowRight className="w-5 h-5 ml-2" />}
               </Button>
             </form>
 

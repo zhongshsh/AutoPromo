@@ -14,11 +14,28 @@ export function LeadPage4() {
     targetRegions: [] as string[],
   });
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (formData.email && formData.name) {
-      setIsSubmitted(true);
+      setIsSubmitting(true);
+      try {
+        await fetch("https://script.google.com/macros/s/AKfycbwtrUkPkBDsEUXZueYLN4NhwrWiGIhHLtO92EXWJMiX2W5uVKw9IaeJ7XpSDbnnWppFcg/exec", {
+          method: "POST",
+          mode: "no-cors",
+          body: JSON.stringify({
+            name: formData.name,
+            email: formData.email,
+            source: "lead-page-4-global",
+          }),
+        });
+        setIsSubmitted(true);
+      } catch {
+        setIsSubmitted(true);
+      } finally {
+        setIsSubmitting(false);
+      }
     }
   };
 
@@ -312,10 +329,11 @@ export function LeadPage4() {
 
               <Button
                 type="submit"
+                disabled={isSubmitting}
                 className="w-full bg-gradient-to-r from-teal-600 to-blue-600 hover:from-teal-700 hover:to-blue-700 h-12 text-lg"
               >
-                Start Free 21-Day Trial
-                <ArrowRight className="w-5 h-5 ml-2" />
+                {isSubmitting ? "Submitting..." : "Start Free 21-Day Trial"}
+                {!isSubmitting && <ArrowRight className="w-5 h-5 ml-2" />}
               </Button>
             </form>
 

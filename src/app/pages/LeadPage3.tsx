@@ -11,14 +11,31 @@ export function LeadPage3() {
   const [twitter, setTwitter] = useState("");
   const [reason, setReason] = useState("");
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Countdown timer state (static for demo)
   const spotsLeft = 47;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (email) {
-      setIsSubmitted(true);
+      setIsSubmitting(true);
+      try {
+        await fetch("https://script.google.com/macros/s/AKfycbwtrUkPkBDsEUXZueYLN4NhwrWiGIhHLtO92EXWJMiX2W5uVKw9IaeJ7XpSDbnnWppFcg/exec", {
+          method: "POST",
+          mode: "no-cors",
+          body: JSON.stringify({
+            name: email,
+            email,
+            source: "lead-page-3-early-access",
+          }),
+        });
+        setIsSubmitted(true);
+      } catch {
+        setIsSubmitted(true);
+      } finally {
+        setIsSubmitting(false);
+      }
     }
   };
 
@@ -251,10 +268,11 @@ export function LeadPage3() {
 
                 <Button
                   type="submit"
+                  disabled={isSubmitting}
                   className="w-full bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700 h-12 text-lg font-semibold"
                 >
-                  Claim Your Spot Now
-                  <ArrowRight className="w-5 h-5 ml-2" />
+                  {isSubmitting ? "Submitting..." : "Claim Your Spot Now"}
+                  {!isSubmitting && <ArrowRight className="w-5 h-5 ml-2" />}
                 </Button>
               </form>
 
