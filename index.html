@@ -313,18 +313,18 @@
           <div class="flex flex-wrap items-center gap-1 sm:gap-3 text-xs sm:text-sm text-slate-500"><span id="project-journal" class="font-medium"></span><span>·</span><span id="project-year"></span><span>·</span><span id="project-doi" class="font-mono text-xs break-all"></span></div>
         </div>
       </div>
-      <div class="flex items-center gap-2 overflow-x-auto pb-1">
-        <button class="project-nav-btn flex items-center gap-2 px-4 py-3 rounded-lg border-2 transition-all bg-indigo-50 border-indigo-600 text-indigo-900" data-tab="content-generation">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg>
-          <div class="text-left"><div class="text-sm font-medium">Content Generation</div><div class="text-xs text-indigo-700">Generate promotional content</div></div>
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+        <button class="project-nav-btn flex items-center gap-2 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg border-2 transition-all bg-indigo-50 border-indigo-600 text-indigo-900" data-tab="content-generation">
+          <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg>
+          <div class="text-left min-w-0"><div class="text-xs sm:text-sm font-medium truncate">Content Generation</div><div class="text-xs text-indigo-700 truncate">Generate promotional content</div></div>
         </button>
-        <button class="project-nav-btn flex items-center gap-2 px-4 py-3 rounded-lg border-2 transition-all bg-white border-slate-200 text-slate-600 hover:border-slate-300" data-tab="analytics">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6m6 0h6m-6 0V9a2 2 0 012-2h2a2 2 0 012 2v10m6 0v-4a2 2 0 00-2-2h-2a2 2 0 00-2 2v4"/></svg>
-          <div class="text-left"><div class="text-sm font-medium">Analytics &amp; Tracking</div><div class="text-xs text-slate-500">Track engagement metrics</div></div>
+        <button class="project-nav-btn flex items-center gap-2 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg border-2 transition-all bg-white border-slate-200 text-slate-600 hover:border-slate-300" data-tab="analytics">
+          <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6m6 0h6m-6 0V9a2 2 0 012-2h2a2 2 0 012 2v10m6 0v-4a2 2 0 00-2-2h-2a2 2 0 00-2 2v4"/></svg>
+          <div class="text-left min-w-0"><div class="text-xs sm:text-sm font-medium truncate">Analytics &amp; Tracking</div><div class="text-xs text-slate-500 truncate">Track engagement metrics</div></div>
         </button>
-        <button class="project-nav-btn flex items-center gap-2 px-4 py-3 rounded-lg border-2 transition-all bg-white border-slate-200 text-slate-600 hover:border-slate-300" data-tab="reports">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-          <div class="text-left"><div class="text-sm font-medium">Reports</div><div class="text-xs text-slate-500">Generate impact reports</div></div>
+        <button class="project-nav-btn flex items-center gap-2 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg border-2 transition-all bg-white border-slate-200 text-slate-600 hover:border-slate-300" data-tab="reports">
+          <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+          <div class="text-left min-w-0"><div class="text-xs sm:text-sm font-medium truncate">Reports</div><div class="text-xs text-slate-500 truncate">Generate impact reports</div></div>
         </button>
       </div>
     </div>
@@ -557,8 +557,8 @@ function showProject(id) {
   generatedContent = {};
   renderPlatformCards();
   document.querySelectorAll('.project-nav-btn').forEach((btn, i) => {
-    if (i === 0) { btn.className = 'project-nav-btn flex items-center gap-2 px-4 py-3 rounded-lg border-2 transition-all bg-indigo-50 border-indigo-600 text-indigo-900'; btn.querySelector('.text-xs').className = 'text-xs text-indigo-700'; }
-    else { btn.className = 'project-nav-btn flex items-center gap-2 px-4 py-3 rounded-lg border-2 transition-all bg-white border-slate-200 text-slate-600 hover:border-slate-300'; btn.querySelector('.text-xs').className = 'text-xs text-slate-500'; }
+    if (i === 0) { btn.className = 'project-nav-btn flex items-center gap-2 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg border-2 transition-all bg-indigo-50 border-indigo-600 text-indigo-900'; btn.querySelector('.text-xs').className = 'text-xs text-indigo-700 truncate'; }
+    else { btn.className = 'project-nav-btn flex items-center gap-2 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg border-2 transition-all bg-white border-slate-200 text-slate-600 hover:border-slate-300'; btn.querySelector('.text-xs').className = 'text-xs text-slate-500 truncate'; }
   });
   document.querySelectorAll('#page-project main > .tab-content').forEach(t => t.classList.remove('active'));
   document.getElementById('tab-content-generation').classList.add('active');
@@ -602,8 +602,8 @@ function generateReport() {
 // Tab switching - Project
 document.querySelectorAll('.project-nav-btn').forEach(btn => {
   btn.addEventListener('click', () => {
-    document.querySelectorAll('.project-nav-btn').forEach(b => { b.className = 'project-nav-btn flex items-center gap-2 px-4 py-3 rounded-lg border-2 transition-all bg-white border-slate-200 text-slate-600 hover:border-slate-300'; b.querySelector('.text-xs').className = 'text-xs text-slate-500'; });
-    btn.className = 'project-nav-btn flex items-center gap-2 px-4 py-3 rounded-lg border-2 transition-all bg-indigo-50 border-indigo-600 text-indigo-900';
+    document.querySelectorAll('.project-nav-btn').forEach(b => { b.className = 'project-nav-btn flex items-center gap-2 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg border-2 transition-all bg-white border-slate-200 text-slate-600 hover:border-slate-300'; b.querySelector('.text-xs').className = 'text-xs text-slate-500 truncate'; });
+    btn.className = 'project-nav-btn flex items-center gap-2 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg border-2 transition-all bg-indigo-50 border-indigo-600 text-indigo-900';
     btn.querySelector('.text-xs').className = 'text-xs text-indigo-700';
     document.querySelectorAll('#page-project main > .tab-content').forEach(t => t.classList.remove('active'));
     document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
