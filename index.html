@@ -1,16 +1,699 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AutoPromo</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    html, body { height: 100%; margin: 0; }
+    .page { display: none; }
+    .page.active { display: block; }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+    .animate-pulse { animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+    textarea { resize: vertical; }
+  </style>
+</head>
+<body class="bg-slate-50 min-h-screen">
 
-  <!DOCTYPE html>
-  <html lang="en">
-    <head>
-      <meta charset="UTF-8" />
-      <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-      <title>AutoPromo - AI-Powered Paper Promotion</title>
-    </head>
+<!-- ==================== DASHBOARD PAGE ==================== -->
+<div id="page-dashboard" class="page active">
+  <header class="bg-white border-b border-slate-200">
+    <div class="max-w-[1600px] mx-auto px-8 py-6">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div>
+            <h1 class="text-2xl font-semibold text-slate-900">AutoPromo</h1>
+            <p class="text-sm text-slate-600 mt-1">Research Impact Automation Platform</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+  <div class="max-w-[1600px] mx-auto px-8 py-8">
+    <!-- User Profile -->
+    <div class="bg-white rounded-lg border border-slate-200 shadow-sm mb-8">
+      <div class="pt-6 px-6 pb-6">
+        <div class="flex items-start justify-between">
+          <div class="flex items-start gap-6">
+            <div class="w-20 h-20 rounded-full bg-indigo-600 flex items-center justify-center text-white text-2xl font-semibold">SM</div>
+            <div>
+              <h2 class="text-2xl font-semibold text-slate-900">Dr. Sarah Mitchell</h2>
+              <p class="text-slate-600 mt-1">Associate Professor</p>
+              <p class="text-slate-500 text-sm mt-1">MIT - Computer Science</p>
+              <p class="text-slate-500 text-sm">s.mitchell@mit.edu</p>
+            </div>
+          </div>
+          <div class="flex flex-col items-end gap-4">
+            <div class="flex items-center gap-8">
+              <div class="text-center"><div class="text-3xl font-semibold text-slate-900">8</div><div class="text-xs text-slate-600 mt-1 uppercase tracking-wide">Papers</div></div>
+              <div class="text-center"><div class="text-3xl font-semibold text-slate-900">2,847</div><div class="text-xs text-slate-600 mt-1 uppercase tracking-wide">Citations</div></div>
+              <div class="text-center"><div class="text-3xl font-semibold text-slate-900">24</div><div class="text-xs text-slate-600 mt-1 uppercase tracking-wide">H-Index</div></div>
+            </div>
+            <a href="#global-impact" class="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-md transition-colors">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
+              Overall Impact
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Papers Header -->
+    <div class="mb-6 flex items-center justify-between">
+      <div>
+        <h3 class="text-xl font-semibold text-slate-900">Research Papers</h3>
+        <p class="text-sm text-slate-600 mt-1">Click on any paper to manage promotional content and track impact</p>
+      </div>
+      <button onclick="document.getElementById('add-paper-dialog').classList.remove('hidden')" class="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-md transition-colors">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 5v14m-7-7h14"/></svg>
+        Add Paper
+      </button>
+    </div>
+    <div class="grid gap-4" id="papers-list"></div>
+  </div>
+</div>
 
-    <body>
-      <div id="root"></div>
-      <script type="module" src="/src/main.tsx"></script>
-    </body>
-  </html>
-  
+<!-- Add Paper Dialog -->
+<div id="add-paper-dialog" class="hidden fixed inset-0 z-50 flex items-center justify-center">
+  <div class="fixed inset-0 bg-black/50" onclick="document.getElementById('add-paper-dialog').classList.add('hidden')"></div>
+  <div class="relative bg-white rounded-lg shadow-xl w-full max-w-[600px] mx-4 p-6 z-10">
+    <div class="flex items-center justify-between mb-1">
+      <h2 class="text-lg font-semibold text-slate-900">Add Research Paper</h2>
+      <button onclick="document.getElementById('add-paper-dialog').classList.add('hidden')" class="text-slate-400 hover:text-slate-600">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <p class="text-sm text-slate-500 mb-5">Import your paper from arXiv, DOI, or upload a PDF file</p>
+    <!-- Import Tabs -->
+    <div class="flex gap-1 bg-slate-100 p-1 rounded-lg mb-5">
+      <button class="import-tab-btn flex-1 px-3 py-2 text-sm font-medium rounded-md bg-white shadow-sm text-slate-900" data-tab="import-arxiv">arXiv</button>
+      <button class="import-tab-btn flex-1 px-3 py-2 text-sm font-medium rounded-md text-slate-600" data-tab="import-doi">DOI</button>
+      <button class="import-tab-btn flex-1 px-3 py-2 text-sm font-medium rounded-md text-slate-600" data-tab="import-upload">Upload PDF</button>
+    </div>
+    <!-- arXiv Tab -->
+    <div id="import-arxiv" class="import-tab-content">
+      <div class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium text-slate-700 mb-1.5">arXiv ID</label>
+          <input type="text" id="arxiv-input" placeholder="2024.12345 or 2024.12345v1" class="w-full px-3 py-2 border border-slate-200 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent" />
+          <p class="text-xs text-slate-500 mt-1.5">Enter the arXiv identifier (e.g., 2024.12345)</p>
+        </div>
+        <button onclick="importPaper('arxiv')" class="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-md transition-colors">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
+          Import from arXiv
+        </button>
+      </div>
+    </div>
+    <!-- DOI Tab -->
+    <div id="import-doi" class="import-tab-content hidden">
+      <div class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium text-slate-700 mb-1.5">DOI</label>
+          <input type="text" id="doi-input" placeholder="10.1000/example.doi.12345" class="w-full px-3 py-2 border border-slate-200 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent" />
+          <p class="text-xs text-slate-500 mt-1.5">Enter the Digital Object Identifier</p>
+        </div>
+        <button onclick="importPaper('doi')" class="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-md transition-colors">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
+          Import from DOI
+        </button>
+      </div>
+    </div>
+    <!-- Upload Tab -->
+    <div id="import-upload" class="import-tab-content hidden">
+      <div class="space-y-4">
+        <div id="upload-drop-zone" onclick="document.getElementById('pdf-file-input').click()" class="border-2 border-dashed border-slate-300 rounded-lg p-8 text-center hover:border-indigo-400 transition-colors cursor-pointer">
+          <svg class="w-12 h-12 text-slate-400 mx-auto mb-3" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"/></svg>
+          <p class="text-sm font-medium text-slate-900 mb-1">Click to upload or drag and drop</p>
+          <p class="text-xs text-slate-500">PDF files up to 50MB</p>
+          <p id="upload-file-name" class="text-sm text-indigo-600 font-medium mt-2 hidden"></p>
+          <input type="file" id="pdf-file-input" accept=".pdf" class="hidden" onchange="handleFileSelect(this)" />
+        </div>
+        <button onclick="importPaper('upload')" class="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-md transition-colors">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"/></svg>
+          Upload PDF
+        </button>
+      </div>
+    </div>
+    <!-- Success Message (hidden by default) -->
+    <div id="import-success" class="hidden mt-4 p-3 bg-green-50 border border-green-200 rounded-lg">
+      <div class="flex items-center gap-2">
+        <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        <span class="text-sm font-medium text-green-800" id="import-success-text">Paper imported successfully!</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== GLOBAL IMPACT PAGE ==================== -->
+<div id="page-global-impact" class="page">
+  <header class="bg-white border-b border-slate-200">
+    <div class="max-w-[1600px] mx-auto px-8 py-6">
+      <div class="flex items-center justify-between">
+        <a href="#dashboard" class="flex items-center gap-2 text-slate-600 hover:text-slate-900 transition-colors">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 12H5m7-7l-7 7 7 7"/></svg>
+          <span class="text-sm">Back to Dashboard</span>
+        </a>
+        <span class="inline-flex items-center border border-slate-200 rounded-full px-3 py-1 text-xs font-medium text-slate-700">Dr. Sarah Mitchell</span>
+      </div>
+      <div class="mt-4">
+        <h1 class="text-2xl font-semibold text-slate-900">Overall Research Impact</h1>
+        <p class="text-sm text-slate-600 mt-1">Aggregated analytics and reports across all research publications</p>
+      </div>
+    </div>
+  </header>
+  <div class="max-w-[1600px] mx-auto px-8 py-8">
+    <div class="grid grid-cols-6 gap-4 mb-8">
+      <div class="bg-white rounded-lg border border-slate-200 shadow-sm pt-6 px-6 pb-6"><div class="text-3xl font-semibold text-slate-900 mb-1">8</div><div class="text-xs text-slate-600 uppercase tracking-wide">Total Papers</div></div>
+      <div class="bg-white rounded-lg border border-slate-200 shadow-sm pt-6 px-6 pb-6"><div class="text-3xl font-semibold text-slate-900 mb-1">2,847</div><div class="text-xs text-slate-600 uppercase tracking-wide">Total Citations</div></div>
+      <div class="bg-white rounded-lg border border-slate-200 shadow-sm pt-6 px-6 pb-6"><div class="text-3xl font-semibold text-slate-900 mb-1">213,584</div><div class="text-xs text-slate-600 uppercase tracking-wide">Total Views</div></div>
+      <div class="bg-white rounded-lg border border-slate-200 shadow-sm pt-6 px-6 pb-6"><div class="text-3xl font-semibold text-slate-900 mb-1">18,627</div><div class="text-xs text-slate-600 uppercase tracking-wide">Engagement</div></div>
+      <div class="bg-white rounded-lg border border-slate-200 shadow-sm pt-6 px-6 pb-6"><div class="text-3xl font-semibold text-slate-900 mb-1">24</div><div class="text-xs text-slate-600 uppercase tracking-wide">H-Index</div></div>
+      <div class="bg-white rounded-lg border border-slate-200 shadow-sm pt-6 px-6 pb-6"><div class="text-3xl font-semibold text-slate-900 mb-1">356</div><div class="text-xs text-slate-600 uppercase tracking-wide">Avg Citations</div></div>
+    </div>
+    <div class="space-y-8">
+      <div class="flex gap-2 bg-slate-100 p-1 rounded-lg w-fit">
+        <button class="gi-tab-btn px-4 py-2 text-sm font-medium rounded-md bg-white shadow-sm text-slate-900" data-tab="gi-analytics">Analytics Overview</button>
+        <button class="gi-tab-btn px-4 py-2 text-sm font-medium rounded-md text-slate-600 hover:text-slate-900" data-tab="gi-reports">Impact Reports</button>
+        <button class="gi-tab-btn px-4 py-2 text-sm font-medium rounded-md text-slate-600 hover:text-slate-900" data-tab="gi-collaboration">Collaboration Network</button>
+      </div>
+      <!-- Analytics -->
+      <div id="gi-analytics" class="tab-content active space-y-8">
+        <div class="bg-white rounded-lg border border-slate-200 shadow-sm">
+          <div class="px-6 py-4 border-b border-slate-200"><h3 class="text-lg font-semibold text-slate-900 flex items-center gap-2"><svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>Overall Citation Growth (12 Months)</h3></div>
+          <div class="p-6"><table class="w-full text-sm"><thead><tr class="text-left text-slate-600 border-b"><th class="pb-2 pr-4">Month</th><th class="pb-2 pr-4">Total Citations</th><th class="pb-2">New</th></tr></thead><tbody>
+            <tr class="border-b border-slate-100"><td class="py-2 pr-4">Mar '25</td><td class="py-2 pr-4 font-semibold">1,847</td><td class="py-2">-</td></tr>
+            <tr class="border-b border-slate-100"><td class="py-2 pr-4">Apr '25</td><td class="py-2 pr-4 font-semibold">1,956</td><td class="py-2 text-green-600">+109</td></tr>
+            <tr class="border-b border-slate-100"><td class="py-2 pr-4">May '25</td><td class="py-2 pr-4 font-semibold">2,089</td><td class="py-2 text-green-600">+133</td></tr>
+            <tr class="border-b border-slate-100"><td class="py-2 pr-4">Jun '25</td><td class="py-2 pr-4 font-semibold">2,234</td><td class="py-2 text-green-600">+145</td></tr>
+            <tr class="border-b border-slate-100"><td class="py-2 pr-4">Jul '25</td><td class="py-2 pr-4 font-semibold">2,401</td><td class="py-2 text-green-600">+167</td></tr>
+            <tr class="border-b border-slate-100"><td class="py-2 pr-4">Aug '25</td><td class="py-2 pr-4 font-semibold">2,534</td><td class="py-2 text-green-600">+133</td></tr>
+            <tr class="border-b border-slate-100"><td class="py-2 pr-4">Sep '25</td><td class="py-2 pr-4 font-semibold">2,656</td><td class="py-2 text-green-600">+122</td></tr>
+            <tr class="border-b border-slate-100"><td class="py-2 pr-4">Oct '25</td><td class="py-2 pr-4 font-semibold">2,734</td><td class="py-2 text-green-600">+78</td></tr>
+            <tr class="border-b border-slate-100"><td class="py-2 pr-4">Nov '25</td><td class="py-2 pr-4 font-semibold">2,789</td><td class="py-2 text-green-600">+55</td></tr>
+            <tr class="border-b border-slate-100"><td class="py-2 pr-4">Dec '25</td><td class="py-2 pr-4 font-semibold">2,812</td><td class="py-2 text-green-600">+23</td></tr>
+            <tr class="border-b border-slate-100"><td class="py-2 pr-4">Jan '26</td><td class="py-2 pr-4 font-semibold">2,834</td><td class="py-2 text-green-600">+22</td></tr>
+            <tr><td class="py-2 pr-4">Feb '26</td><td class="py-2 pr-4 font-semibold">2,847</td><td class="py-2 text-green-600">+13</td></tr>
+          </tbody></table></div>
+        </div>
+        <div class="grid grid-cols-2 gap-8">
+          <div class="bg-white rounded-lg border border-slate-200 shadow-sm">
+            <div class="px-6 py-4 border-b border-slate-200"><h3 class="text-lg font-semibold text-slate-900">Paper Performance Comparison</h3></div>
+            <div class="p-6 space-y-3">
+              <div class="flex items-center justify-between"><span class="text-sm text-slate-700 flex-1">Energy-Efficient Deep Learning</span><span class="font-semibold text-sm w-20 text-right">812</span><div class="w-40 ml-4 bg-slate-200 rounded-full h-2"><div class="bg-indigo-600 h-2 rounded-full" style="width:100%"></div></div></div>
+              <div class="flex items-center justify-between"><span class="text-sm text-slate-700 flex-1">Interpretable AI for Healthcare</span><span class="font-semibold text-sm w-20 text-right">623</span><div class="w-40 ml-4 bg-slate-200 rounded-full h-2"><div class="bg-indigo-600 h-2 rounded-full" style="width:76.7%"></div></div></div>
+              <div class="flex items-center justify-between"><span class="text-sm text-slate-700 flex-1">Federated Learning Framework</span><span class="font-semibold text-sm w-20 text-right">489</span><div class="w-40 ml-4 bg-slate-200 rounded-full h-2"><div class="bg-indigo-600 h-2 rounded-full" style="width:60.2%"></div></div></div>
+              <div class="flex items-center justify-between"><span class="text-sm text-slate-700 flex-1">Adversarial Robustness</span><span class="font-semibold text-sm w-20 text-right">425</span><div class="w-40 ml-4 bg-slate-200 rounded-full h-2"><div class="bg-indigo-600 h-2 rounded-full" style="width:52.3%"></div></div></div>
+              <div class="flex items-center justify-between"><span class="text-sm text-slate-700 flex-1">Quantum-Inspired Algorithms</span><span class="font-semibold text-sm w-20 text-right">342</span><div class="w-40 ml-4 bg-slate-200 rounded-full h-2"><div class="bg-indigo-600 h-2 rounded-full" style="width:42.1%"></div></div></div>
+              <div class="flex items-center justify-between"><span class="text-sm text-slate-700 flex-1">Neural Architecture Search</span><span class="font-semibold text-sm w-20 text-right">156</span><div class="w-40 ml-4 bg-slate-200 rounded-full h-2"><div class="bg-indigo-600 h-2 rounded-full" style="width:19.2%"></div></div></div>
+            </div>
+          </div>
+          <div class="bg-white rounded-lg border border-slate-200 shadow-sm">
+            <div class="px-6 py-4 border-b border-slate-200"><h3 class="text-lg font-semibold text-slate-900">Research Impact by Field</h3></div>
+            <div class="p-6 space-y-3">
+              <div class="flex items-center justify-between text-sm"><div class="flex items-center gap-2"><div class="w-3 h-3 rounded-full bg-indigo-600"></div><span class="text-slate-700">Machine Learning</span></div><span class="font-semibold text-slate-900">35%</span></div>
+              <div class="flex items-center justify-between text-sm"><div class="flex items-center gap-2"><div class="w-3 h-3 rounded-full bg-cyan-500"></div><span class="text-slate-700">Computer Vision</span></div><span class="font-semibold text-slate-900">25%</span></div>
+              <div class="flex items-center justify-between text-sm"><div class="flex items-center gap-2"><div class="w-3 h-3 rounded-full bg-violet-500"></div><span class="text-slate-700">Healthcare AI</span></div><span class="font-semibold text-slate-900">20%</span></div>
+              <div class="flex items-center justify-between text-sm"><div class="flex items-center gap-2"><div class="w-3 h-3 rounded-full bg-emerald-500"></div><span class="text-slate-700">Edge Computing</span></div><span class="font-semibold text-slate-900">12%</span></div>
+              <div class="flex items-center justify-between text-sm"><div class="flex items-center gap-2"><div class="w-3 h-3 rounded-full bg-amber-500"></div><span class="text-slate-700">Privacy &amp; Security</span></div><span class="font-semibold text-slate-900">8%</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="bg-white rounded-lg border border-slate-200 shadow-sm">
+          <div class="px-6 py-4 border-b border-slate-200"><h3 class="text-lg font-semibold text-slate-900">Platform Distribution &amp; Performance</h3></div>
+          <div class="p-6 space-y-4">
+            <div class="flex items-center gap-4"><div class="w-32 font-medium text-slate-900 text-sm">Twitter/X</div><div class="flex-1"><div class="flex items-center justify-between mb-1"><span class="text-xs text-slate-600">6 posts</span><span class="text-xs text-slate-600">78,456 views · 8,934 engagement</span></div><div class="w-full bg-slate-200 rounded-full h-2"><div class="bg-indigo-600 h-2 rounded-full" style="width:100%"></div></div></div></div>
+            <div class="flex items-center gap-4"><div class="w-32 font-medium text-slate-900 text-sm">Reddit</div><div class="flex-1"><div class="flex items-center justify-between mb-1"><span class="text-xs text-slate-600">5 posts</span><span class="text-xs text-slate-600">45,678 views · 5,123 engagement</span></div><div class="w-full bg-slate-200 rounded-full h-2"><div class="bg-indigo-600 h-2 rounded-full" style="width:58.2%"></div></div></div></div>
+            <div class="flex items-center gap-4"><div class="w-32 font-medium text-slate-900 text-sm">LinkedIn</div><div class="flex-1"><div class="flex items-center justify-between mb-1"><span class="text-xs text-slate-600">4 posts</span><span class="text-xs text-slate-600">34,567 views · 2,890 engagement</span></div><div class="w-full bg-slate-200 rounded-full h-2"><div class="bg-indigo-600 h-2 rounded-full" style="width:44.1%"></div></div></div></div>
+            <div class="flex items-center gap-4"><div class="w-32 font-medium text-slate-900 text-sm">小红书</div><div class="flex-1"><div class="flex items-center justify-between mb-1"><span class="text-xs text-slate-600">2 posts</span><span class="text-xs text-slate-600">23,456 views · 1,234 engagement</span></div><div class="w-full bg-slate-200 rounded-full h-2"><div class="bg-indigo-600 h-2 rounded-full" style="width:29.9%"></div></div></div></div>
+            <div class="flex items-center gap-4"><div class="w-32 font-medium text-slate-900 text-sm">Blog</div><div class="flex-1"><div class="flex items-center justify-between mb-1"><span class="text-xs text-slate-600">6 posts</span><span class="text-xs text-slate-600">18,934 views · 890 engagement</span></div><div class="w-full bg-slate-200 rounded-full h-2"><div class="bg-indigo-600 h-2 rounded-full" style="width:24.1%"></div></div></div></div>
+            <div class="flex items-center gap-4"><div class="w-32 font-medium text-slate-900 text-sm">Medium</div><div class="flex-1"><div class="flex items-center justify-between mb-1"><span class="text-xs text-slate-600">3 posts</span><span class="text-xs text-slate-600">12,493 views · 556 engagement</span></div><div class="w-full bg-slate-200 rounded-full h-2"><div class="bg-indigo-600 h-2 rounded-full" style="width:15.9%"></div></div></div></div>
+          </div>
+        </div>
+      </div>
+      <!-- Reports -->
+      <div id="gi-reports" class="tab-content space-y-8">
+        <div class="bg-white rounded-lg border border-slate-200 shadow-sm">
+          <div class="px-6 py-4 border-b border-slate-200"><h3 class="text-lg font-semibold text-slate-900">Annual Research Impact Summary - 2025</h3></div>
+          <div class="p-6 space-y-6">
+            <div class="grid grid-cols-4 gap-4">
+              <div class="p-4 bg-white rounded-lg border border-slate-200"><div class="text-2xl font-semibold text-slate-900">7</div><div class="text-xs text-slate-600 uppercase tracking-wide mt-1">Papers Published</div></div>
+              <div class="p-4 bg-white rounded-lg border border-slate-200"><div class="text-2xl font-semibold text-slate-900">1,000+</div><div class="text-xs text-slate-600 uppercase tracking-wide mt-1">New Citations</div></div>
+              <div class="p-4 bg-white rounded-lg border border-slate-200"><div class="text-2xl font-semibold text-slate-900">$2.4M</div><div class="text-xs text-slate-600 uppercase tracking-wide mt-1">Grant Funding</div></div>
+              <div class="p-4 bg-white rounded-lg border border-slate-200"><div class="text-2xl font-semibold text-slate-900">156K+</div><div class="text-xs text-slate-600 uppercase tracking-wide mt-1">Media Reach</div></div>
+            </div>
+            <div><h4 class="font-semibold text-slate-900 mb-3">Year Highlights</h4><ul class="space-y-2">
+              <li class="flex items-start gap-2 text-sm text-slate-700"><svg class="w-4 h-4 text-indigo-600 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2l3 7h7l-5.5 4 2 7L12 16l-6.5 4 2-7L2 9h7z"/></svg>Published in Nature Machine Intelligence, Science Advances, and The Lancet Digital Health</li>
+              <li class="flex items-start gap-2 text-sm text-slate-700"><svg class="w-4 h-4 text-indigo-600 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2l3 7h7l-5.5 4 2 7L12 16l-6.5 4 2-7L2 9h7z"/></svg>Secured $2.4M in new grant funding from NSF and NIH</li>
+              <li class="flex items-start gap-2 text-sm text-slate-700"><svg class="w-4 h-4 text-indigo-600 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2l3 7h7l-5.5 4 2 7L12 16l-6.5 4 2-7L2 9h7z"/></svg>Research cited in 3 federal policy documents</li>
+              <li class="flex items-start gap-2 text-sm text-slate-700"><svg class="w-4 h-4 text-indigo-600 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2l3 7h7l-5.5 4 2 7L12 16l-6.5 4 2-7L2 9h7z"/></svg>Expanded digital reach to 156K+ individuals across 6 platforms</li>
+              <li class="flex items-start gap-2 text-sm text-slate-700"><svg class="w-4 h-4 text-indigo-600 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2l3 7h7l-5.5 4 2 7L12 16l-6.5 4 2-7L2 9h7z"/></svg>Established 12 international research collaborations</li>
+            </ul></div>
+            <div class="flex items-center justify-between pt-6 border-t border-slate-200">
+              <p class="text-sm text-slate-600">Generate and download comprehensive impact report</p>
+              <div class="flex items-center gap-3">
+                <button class="inline-flex items-center gap-2 px-3 py-2 border border-slate-200 rounded-md text-sm font-medium text-slate-700 hover:bg-slate-50">Export PDF</button>
+                <button class="inline-flex items-center gap-2 px-3 py-2 border border-slate-200 rounded-md text-sm font-medium text-slate-700 hover:bg-slate-50">Export Word</button>
+                <button class="inline-flex items-center gap-2 px-3 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-md">Generate Full Report</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Collaboration -->
+      <div id="gi-collaboration" class="tab-content space-y-8">
+        <div class="grid grid-cols-3 gap-6">
+          <div class="bg-white rounded-lg border border-slate-200 shadow-sm pt-6 px-6 pb-6"><div class="text-3xl font-semibold text-slate-900 mb-1">47</div><div class="text-xs text-slate-600 uppercase tracking-wide">Total Co-authors</div></div>
+          <div class="bg-white rounded-lg border border-slate-200 shadow-sm pt-6 px-6 pb-6"><div class="text-3xl font-semibold text-slate-900 mb-1">12</div><div class="text-xs text-slate-600 uppercase tracking-wide">Partner Institutions</div></div>
+          <div class="bg-white rounded-lg border border-slate-200 shadow-sm pt-6 px-6 pb-6"><div class="text-3xl font-semibold text-slate-900 mb-1">8</div><div class="text-xs text-slate-600 uppercase tracking-wide">Countries</div></div>
+        </div>
+        <div class="bg-white rounded-lg border border-slate-200 shadow-sm">
+          <div class="px-6 py-4 border-b border-slate-200"><h3 class="text-lg font-semibold text-slate-900">Top Collaborators</h3></div>
+          <div class="p-6 space-y-3">
+            <div class="flex items-center justify-between p-4 bg-slate-50 rounded-lg border border-slate-200"><div class="flex items-center gap-4"><div class="w-10 h-10 rounded-full bg-indigo-600 flex items-center justify-center text-white font-semibold text-sm">JC</div><div><div class="font-medium text-slate-900">John Chen</div><div class="text-sm text-slate-600">MIT</div></div></div><span class="inline-flex items-center border border-slate-200 rounded-full px-3 py-1 text-xs font-medium text-slate-700">4 papers</span></div>
+            <div class="flex items-center justify-between p-4 bg-slate-50 rounded-lg border border-slate-200"><div class="flex items-center gap-4"><div class="w-10 h-10 rounded-full bg-indigo-600 flex items-center justify-center text-white font-semibold text-sm">ER</div><div><div class="font-medium text-slate-900">Emily Rodriguez</div><div class="text-sm text-slate-600">MIT</div></div></div><span class="inline-flex items-center border border-slate-200 rounded-full px-3 py-1 text-xs font-medium text-slate-700">3 papers</span></div>
+            <div class="flex items-center justify-between p-4 bg-slate-50 rounded-lg border border-slate-200"><div class="flex items-center gap-4"><div class="w-10 h-10 rounded-full bg-indigo-600 flex items-center justify-center text-white font-semibold text-sm">DP</div><div><div class="font-medium text-slate-900">David Park</div><div class="text-sm text-slate-600">Stanford</div></div></div><span class="inline-flex items-center border border-slate-200 rounded-full px-3 py-1 text-xs font-medium text-slate-700">3 papers</span></div>
+            <div class="flex items-center justify-between p-4 bg-slate-50 rounded-lg border border-slate-200"><div class="flex items-center gap-4"><div class="w-10 h-10 rounded-full bg-indigo-600 flex items-center justify-center text-white font-semibold text-sm">LW</div><div><div class="font-medium text-slate-900">Lisa Wang</div><div class="text-sm text-slate-600">Stanford</div></div></div><span class="inline-flex items-center border border-slate-200 rounded-full px-3 py-1 text-xs font-medium text-slate-700">2 papers</span></div>
+            <div class="flex items-center justify-between p-4 bg-slate-50 rounded-lg border border-slate-200"><div class="flex items-center gap-4"><div class="w-10 h-10 rounded-full bg-indigo-600 flex items-center justify-center text-white font-semibold text-sm">MZ</div><div><div class="font-medium text-slate-900">Michael Zhang</div><div class="text-sm text-slate-600">Berkeley</div></div></div><span class="inline-flex items-center border border-slate-200 rounded-full px-3 py-1 text-xs font-medium text-slate-700">2 papers</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== PROJECT PAGE ==================== -->
+<div id="page-project" class="page">
+  <header class="bg-white border-b border-slate-200">
+    <div class="max-w-[1600px] mx-auto px-8 py-6">
+      <div class="flex items-center justify-between mb-4">
+        <a href="#dashboard" class="flex items-center gap-2 text-slate-600 hover:text-slate-900 transition-colors">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 12H5m7-7l-7 7 7 7"/></svg>
+          <span class="text-sm">Back to Dashboard</span>
+        </a>
+        <div class="flex items-center gap-2">
+          <button id="prev-project-btn" onclick="navigateProject(-1)" class="inline-flex items-center gap-1 px-3 py-1.5 border border-slate-200 rounded-md text-sm font-medium text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7"/></svg>
+            Prev
+          </button>
+          <span id="project-badge" class="inline-flex items-center border border-slate-200 rounded-full px-3 py-1 text-xs font-medium text-slate-700">Project #1</span>
+          <button id="next-project-btn" onclick="navigateProject(1)" class="inline-flex items-center gap-1 px-3 py-1.5 border border-slate-200 rounded-md text-sm font-medium text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors">
+            Next
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg>
+          </button>
+        </div>
+      </div>
+      <div class="flex items-start gap-4 mb-6">
+        <svg class="w-6 h-6 text-indigo-600 mt-1 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+        <div class="flex-1">
+          <h1 id="project-title" class="text-xl font-semibold text-slate-900 leading-tight mb-2"></h1>
+          <p id="project-authors" class="text-sm text-slate-600 mb-2"></p>
+          <div class="flex items-center gap-3 text-sm text-slate-500"><span id="project-journal" class="font-medium"></span><span>·</span><span id="project-year"></span><span>·</span><span id="project-doi" class="font-mono text-xs"></span></div>
+        </div>
+      </div>
+      <div class="flex items-center gap-2">
+        <button class="project-nav-btn flex items-center gap-2 px-4 py-3 rounded-lg border-2 transition-all bg-indigo-50 border-indigo-600 text-indigo-900" data-tab="content-generation">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg>
+          <div class="text-left"><div class="text-sm font-medium">Content Generation</div><div class="text-xs text-indigo-700">Generate promotional content</div></div>
+        </button>
+        <button class="project-nav-btn flex items-center gap-2 px-4 py-3 rounded-lg border-2 transition-all bg-white border-slate-200 text-slate-600 hover:border-slate-300" data-tab="analytics">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6m6 0h6m-6 0V9a2 2 0 012-2h2a2 2 0 012 2v10m6 0v-4a2 2 0 00-2-2h-2a2 2 0 00-2 2v4"/></svg>
+          <div class="text-left"><div class="text-sm font-medium">Analytics &amp; Tracking</div><div class="text-xs text-slate-500">Track engagement metrics</div></div>
+        </button>
+        <button class="project-nav-btn flex items-center gap-2 px-4 py-3 rounded-lg border-2 transition-all bg-white border-slate-200 text-slate-600 hover:border-slate-300" data-tab="reports">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+          <div class="text-left"><div class="text-sm font-medium">Reports</div><div class="text-xs text-slate-500">Generate impact reports</div></div>
+        </button>
+      </div>
+    </div>
+  </header>
+  <main class="max-w-[1600px] mx-auto px-8 py-8">
+    <!-- Content Generation -->
+    <div id="tab-content-generation" class="tab-content active">
+      <div class="space-y-8">
+        <div class="flex items-center justify-between">
+          <div><h2 class="text-2xl font-semibold text-slate-900 mb-2">Content Generation</h2><p class="text-slate-600">Generate platform-optimized promotional content for your research paper</p></div>
+          <button onclick="generateAllContent()" class="inline-flex items-center gap-2 px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-md transition-colors">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg>
+            Generate All Content
+          </button>
+        </div>
+        <div class="grid grid-cols-2 gap-6" id="platforms-grid"></div>
+        <div class="bg-white rounded-lg border border-slate-200 shadow-sm">
+          <div class="px-6 py-4 border-b border-slate-200"><h3 class="text-lg font-semibold text-slate-900">Content Generation Guidelines</h3></div>
+          <div class="p-6"><div class="grid grid-cols-3 gap-6 text-sm">
+            <div><h4 class="font-semibold text-slate-900 mb-2">🎯 Platform Optimization</h4><p class="text-slate-600">Each platform has unique audience expectations and content formats. Our AI adapts tone, length, and style accordingly.</p></div>
+            <div><h4 class="font-semibold text-slate-900 mb-2">📝 Editable Content</h4><p class="text-slate-600">All generated content is fully editable. Customize the message to match your voice and add platform-specific details.</p></div>
+            <div><h4 class="font-semibold text-slate-900 mb-2">🔄 Regenerate Anytime</h4><p class="text-slate-600">Not satisfied with the output? Regenerate content for any platform with a single click to get alternative versions.</p></div>
+          </div></div>
+        </div>
+      </div>
+    </div>
+    <!-- Analytics -->
+    <div id="tab-analytics" class="tab-content">
+      <div class="space-y-8">
+        <div><h2 class="text-2xl font-semibold text-slate-900 mb-2">Analytics &amp; Tracking</h2><p class="text-slate-600">Monitor engagement metrics across all platforms and track citation growth</p></div>
+        <div class="grid grid-cols-4 gap-4">
+          <div class="bg-white rounded-lg border border-slate-200 shadow-sm pt-6 px-6 pb-6"><div class="flex items-center justify-between mb-2"><svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg><span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-600 text-white">+26.4%</span></div><div class="text-3xl font-semibold text-slate-900 mb-1">12,847</div><div class="text-xs text-slate-600 uppercase tracking-wide">Total Views</div></div>
+          <div class="bg-white rounded-lg border border-slate-200 shadow-sm pt-6 px-6 pb-6"><div class="flex items-center justify-between mb-2"><svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5"/></svg><span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-600 text-white">+31.2%</span></div><div class="text-3xl font-semibold text-slate-900 mb-1">892</div><div class="text-xs text-slate-600 uppercase tracking-wide">Engagement</div></div>
+          <div class="bg-white rounded-lg border border-slate-200 shadow-sm pt-6 px-6 pb-6"><div class="flex items-center justify-between mb-2"><svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/></svg><span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-600 text-white">+18.7%</span></div><div class="text-3xl font-semibold text-slate-900 mb-1">161</div><div class="text-xs text-slate-600 uppercase tracking-wide">Shares</div></div>
+          <div class="bg-white rounded-lg border border-slate-200 shadow-sm pt-6 px-6 pb-6"><div class="flex items-center justify-between mb-2"><svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg><span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-600 text-white">+21.4%</span></div><div class="text-3xl font-semibold text-slate-900 mb-1">180</div><div class="text-xs text-slate-600 uppercase tracking-wide">Citations</div></div>
+        </div>
+        <div class="bg-white rounded-lg border border-slate-200 shadow-sm">
+          <div class="px-6 py-4 border-b border-slate-200"><h3 class="text-lg font-semibold text-slate-900">Platform Comparison</h3></div>
+          <div class="p-6 grid gap-4">
+            <div class="p-4 border border-slate-200 rounded-lg"><div class="flex items-center justify-between mb-4"><div class="flex items-center gap-3"><div class="w-10 h-10 rounded-lg bg-slate-100 flex items-center justify-center text-lg">𝕏</div><h3 class="font-semibold text-slate-900">Twitter/X</h3></div><span class="inline-flex items-center border border-slate-200 rounded-full px-3 py-1 text-xs font-medium text-slate-700">Active</span></div><div class="grid grid-cols-5 gap-4"><div><div class="text-2xl font-semibold text-slate-900">3,245</div><div class="text-xs text-slate-600 uppercase tracking-wide">Views</div></div><div><div class="text-2xl font-semibold text-slate-900">412</div><div class="text-xs text-slate-600 uppercase tracking-wide">Engagement</div></div><div><div class="text-2xl font-semibold text-slate-900">89</div><div class="text-xs text-slate-600 uppercase tracking-wide">Shares</div></div><div><div class="text-2xl font-semibold text-slate-900">156</div><div class="text-xs text-slate-600 uppercase tracking-wide">Comments</div></div><div><div class="text-2xl font-semibold text-slate-900">1,847</div><div class="text-xs text-slate-600 uppercase tracking-wide">Likes</div></div></div></div>
+            <div class="p-4 border border-slate-200 rounded-lg"><div class="flex items-center justify-between mb-4"><div class="flex items-center gap-3"><div class="w-10 h-10 rounded-lg bg-slate-100 flex items-center justify-center text-lg">🤖</div><h3 class="font-semibold text-slate-900">Reddit</h3></div><span class="inline-flex items-center border border-slate-200 rounded-full px-3 py-1 text-xs font-medium text-slate-700">Active</span></div><div class="grid grid-cols-5 gap-4"><div><div class="text-2xl font-semibold text-slate-900">1,867</div><div class="text-xs text-slate-600 uppercase tracking-wide">Views</div></div><div><div class="text-2xl font-semibold text-slate-900">234</div><div class="text-xs text-slate-600 uppercase tracking-wide">Engagement</div></div><div><div class="text-2xl font-semibold text-slate-900">45</div><div class="text-xs text-slate-600 uppercase tracking-wide">Shares</div></div><div><div class="text-2xl font-semibold text-slate-900">187</div><div class="text-xs text-slate-600 uppercase tracking-wide">Comments</div></div><div><div class="text-2xl font-semibold text-slate-900">892</div><div class="text-xs text-slate-600 uppercase tracking-wide">Likes</div></div></div></div>
+            <div class="p-4 border border-slate-200 rounded-lg"><div class="flex items-center justify-between mb-4"><div class="flex items-center gap-3"><div class="w-10 h-10 rounded-lg bg-slate-100 flex items-center justify-center text-lg">💼</div><h3 class="font-semibold text-slate-900">LinkedIn</h3></div><span class="inline-flex items-center border border-slate-200 rounded-full px-3 py-1 text-xs font-medium text-slate-700">Active</span></div><div class="grid grid-cols-5 gap-4"><div><div class="text-2xl font-semibold text-slate-900">1,456</div><div class="text-xs text-slate-600 uppercase tracking-wide">Views</div></div><div><div class="text-2xl font-semibold text-slate-900">178</div><div class="text-xs text-slate-600 uppercase tracking-wide">Engagement</div></div><div><div class="text-2xl font-semibold text-slate-900">23</div><div class="text-xs text-slate-600 uppercase tracking-wide">Shares</div></div><div><div class="text-2xl font-semibold text-slate-900">89</div><div class="text-xs text-slate-600 uppercase tracking-wide">Comments</div></div><div><div class="text-2xl font-semibold text-slate-900">543</div><div class="text-xs text-slate-600 uppercase tracking-wide">Likes</div></div></div></div>
+            <div class="p-4 border border-slate-200 rounded-lg"><div class="flex items-center justify-between mb-4"><div class="flex items-center gap-3"><div class="w-10 h-10 rounded-lg bg-slate-100 flex items-center justify-center text-lg">📕</div><h3 class="font-semibold text-slate-900">小红书</h3></div><span class="inline-flex items-center border border-slate-200 rounded-full px-3 py-1 text-xs font-medium text-slate-700">Active</span></div><div class="grid grid-cols-5 gap-4"><div><div class="text-2xl font-semibold text-slate-900">892</div><div class="text-xs text-slate-600 uppercase tracking-wide">Views</div></div><div><div class="text-2xl font-semibold text-slate-900">123</div><div class="text-xs text-slate-600 uppercase tracking-wide">Engagement</div></div><div><div class="text-2xl font-semibold text-slate-900">34</div><div class="text-xs text-slate-600 uppercase tracking-wide">Shares</div></div><div><div class="text-2xl font-semibold text-slate-900">67</div><div class="text-xs text-slate-600 uppercase tracking-wide">Comments</div></div><div><div class="text-2xl font-semibold text-slate-900">456</div><div class="text-xs text-slate-600 uppercase tracking-wide">Likes</div></div></div></div>
+          </div>
+        </div>
+        <div class="bg-white rounded-lg border border-slate-200 shadow-sm">
+          <div class="px-6 py-4 border-b border-slate-200"><h3 class="text-lg font-semibold text-slate-900 flex items-center gap-2"><svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>Google Scholar Citation Growth</h3></div>
+          <div class="p-6"><table class="w-full text-sm"><thead><tr class="text-left text-slate-600 border-b"><th class="pb-2 pr-4">Month</th><th class="pb-2 pr-4">Total</th><th class="pb-2">New</th></tr></thead><tbody>
+            <tr class="border-b border-slate-100"><td class="py-2">Sep '25</td><td class="py-2 font-semibold">112</td><td class="py-2">-</td></tr>
+            <tr class="border-b border-slate-100"><td class="py-2">Oct '25</td><td class="py-2 font-semibold">118</td><td class="py-2 text-green-600">+6</td></tr>
+            <tr class="border-b border-slate-100"><td class="py-2">Nov '25</td><td class="py-2 font-semibold">127</td><td class="py-2 text-green-600">+9</td></tr>
+            <tr class="border-b border-slate-100"><td class="py-2">Dec '25</td><td class="py-2 font-semibold">139</td><td class="py-2 text-green-600">+12</td></tr>
+            <tr class="border-b border-slate-100"><td class="py-2">Jan '26</td><td class="py-2 font-semibold">156</td><td class="py-2 text-green-600">+17</td></tr>
+            <tr><td class="py-2">Feb '26</td><td class="py-2 font-semibold">180</td><td class="py-2 text-green-600">+24</td></tr>
+          </tbody></table>
+          <div class="mt-6 grid grid-cols-3 gap-4 pt-4 border-t border-slate-200">
+            <div class="text-center"><div class="text-2xl font-semibold text-slate-900">180</div><div class="text-xs text-slate-600 uppercase tracking-wide mt-1">Total Citations</div></div>
+            <div class="text-center"><div class="text-2xl font-semibold text-green-600">+24</div><div class="text-xs text-slate-600 uppercase tracking-wide mt-1">This Month</div></div>
+            <div class="text-center"><div class="text-2xl font-semibold text-green-600">+21.4%</div><div class="text-xs text-slate-600 uppercase tracking-wide mt-1">Growth Rate</div></div>
+          </div></div>
+        </div>
+        <div class="grid grid-cols-2 gap-6">
+          <div class="bg-white rounded-lg border border-slate-200 shadow-sm"><div class="px-6 py-4 border-b border-slate-200"><h3 class="text-lg font-semibold text-slate-900">Geographic Distribution</h3></div><div class="p-6 space-y-4">
+            <div><div class="flex items-center justify-between mb-2"><span class="text-sm font-medium text-slate-700">North America</span><span class="text-sm text-slate-600">2,989 views (42%)</span></div><div class="w-full bg-slate-200 rounded-full h-3"><div class="bg-indigo-600 h-3 rounded-full" style="width:42%"></div></div></div>
+            <div><div class="flex items-center justify-between mb-2"><span class="text-sm font-medium text-slate-700">Europe</span><span class="text-sm text-slate-600">1,994 views (28%)</span></div><div class="w-full bg-slate-200 rounded-full h-3"><div class="bg-indigo-600 h-3 rounded-full" style="width:28%"></div></div></div>
+            <div><div class="flex items-center justify-between mb-2"><span class="text-sm font-medium text-slate-700">Asia</span><span class="text-sm text-slate-600">1,496 views (21%)</span></div><div class="w-full bg-slate-200 rounded-full h-3"><div class="bg-indigo-600 h-3 rounded-full" style="width:21%"></div></div></div>
+            <div><div class="flex items-center justify-between mb-2"><span class="text-sm font-medium text-slate-700">Other</span><span class="text-sm text-slate-600">641 views (9%)</span></div><div class="w-full bg-slate-200 rounded-full h-3"><div class="bg-indigo-600 h-3 rounded-full" style="width:9%"></div></div></div>
+          </div></div>
+          <div class="bg-white rounded-lg border border-slate-200 shadow-sm"><div class="px-6 py-4 border-b border-slate-200"><h3 class="text-lg font-semibold text-slate-900">Top Referral Sources</h3></div><div class="p-6 space-y-4">
+            <div><div class="flex items-center justify-between mb-2"><span class="text-sm font-medium text-slate-700">Direct</span><span class="text-sm text-slate-600">2,422 visits (34%)</span></div><div class="w-full bg-slate-200 rounded-full h-3"><div class="bg-cyan-600 h-3 rounded-full" style="width:34%"></div></div></div>
+            <div><div class="flex items-center justify-between mb-2"><span class="text-sm font-medium text-slate-700">Twitter/X</span><span class="text-sm text-slate-600">1,994 visits (28%)</span></div><div class="w-full bg-slate-200 rounded-full h-3"><div class="bg-cyan-600 h-3 rounded-full" style="width:28%"></div></div></div>
+            <div><div class="flex items-center justify-between mb-2"><span class="text-sm font-medium text-slate-700">Google Search</span><span class="text-sm text-slate-600">1,282 visits (18%)</span></div><div class="w-full bg-slate-200 rounded-full h-3"><div class="bg-cyan-600 h-3 rounded-full" style="width:18%"></div></div></div>
+            <div><div class="flex items-center justify-between mb-2"><span class="text-sm font-medium text-slate-700">Reddit</span><span class="text-sm text-slate-600">854 visits (12%)</span></div><div class="w-full bg-slate-200 rounded-full h-3"><div class="bg-cyan-600 h-3 rounded-full" style="width:12%"></div></div></div>
+            <div><div class="flex items-center justify-between mb-2"><span class="text-sm font-medium text-slate-700">LinkedIn</span><span class="text-sm text-slate-600">569 visits (8%)</span></div><div class="w-full bg-slate-200 rounded-full h-3"><div class="bg-cyan-600 h-3 rounded-full" style="width:8%"></div></div></div>
+          </div></div>
+        </div>
+        <div class="bg-white rounded-lg border border-slate-200 shadow-sm pt-6 px-6 pb-6"><div class="flex items-center justify-between"><div class="flex items-center gap-3"><div class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div><span class="text-sm text-slate-700">Real-time tracking active across all platforms</span><span class="inline-flex items-center border border-slate-200 rounded-full px-3 py-1 text-xs font-medium text-slate-700">Last updated: 2 minutes ago</span></div><span class="text-xs text-slate-500">Data refreshes every 5 minutes</span></div></div>
+      </div>
+    </div>
+    <!-- Reports -->
+    <div id="tab-reports" class="tab-content">
+      <div class="space-y-8">
+        <div class="flex items-center justify-between">
+          <div><h2 class="text-2xl font-semibold text-slate-900 mb-2">Impact Reports</h2><p class="text-slate-600">Generate comprehensive impact reports for grants, annual reviews, and trend analysis</p></div>
+          <button id="generate-report-btn" onclick="generateReport()" class="inline-flex items-center gap-2 px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-md transition-colors">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+            Generate Report
+          </button>
+        </div>
+        <div class="bg-white rounded-lg border border-slate-200 shadow-sm"><div class="px-6 py-4 border-b border-slate-200"><h3 class="text-lg font-semibold text-slate-900">Select Report Type</h3></div><div class="p-6"><div class="grid grid-cols-5 gap-3">
+          <button class="report-type-btn p-4 rounded-lg border-2 text-left transition-all border-indigo-600 bg-indigo-50" data-type="grant"><div class="text-sm font-medium mb-1 text-indigo-900">Grant Impact Report</div><div class="text-xs text-indigo-700">For NSF, NIH, DOE grant applications</div></button>
+          <button class="report-type-btn p-4 rounded-lg border-2 text-left transition-all border-slate-200 bg-white hover:border-slate-300" data-type="annual"><div class="text-sm font-medium mb-1 text-slate-900">Annual Impact Report</div><div class="text-xs text-slate-500">Comprehensive yearly summary</div></button>
+          <button class="report-type-btn p-4 rounded-lg border-2 text-left transition-all border-slate-200 bg-white hover:border-slate-300" data-type="quarterly"><div class="text-sm font-medium mb-1 text-slate-900">Quarterly Report</div><div class="text-xs text-slate-500">Quarterly performance metrics</div></button>
+          <button class="report-type-btn p-4 rounded-lg border-2 text-left transition-all border-slate-200 bg-white hover:border-slate-300" data-type="growth"><div class="text-sm font-medium mb-1 text-slate-900">Growth Trend Analysis</div><div class="text-xs text-slate-500">Citation and engagement trends</div></button>
+          <button class="report-type-btn p-4 rounded-lg border-2 text-left transition-all border-slate-200 bg-white hover:border-slate-300" data-type="institutional"><div class="text-sm font-medium mb-1 text-slate-900">Institutional Report</div><div class="text-xs text-slate-500">University-level documentation</div></button>
+        </div></div></div>
+        <div id="report-output" class="hidden space-y-6">
+          <div class="bg-indigo-50 rounded-lg border-2 border-indigo-200 pt-6 px-6 pb-6"><div class="flex items-center justify-between"><div class="flex items-center gap-4"><svg class="w-8 h-8 text-indigo-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg><div><div class="font-semibold text-slate-900 text-lg">Report Generated Successfully</div><div class="text-sm text-slate-600 mt-1">Grant Impact Report · Generated on March 2, 2026</div></div></div><div class="flex items-center gap-3"><button class="inline-flex items-center gap-2 px-3 py-2 border border-slate-200 rounded-md text-sm font-medium text-slate-700 hover:bg-slate-50 bg-white">Export PDF</button><button class="inline-flex items-center gap-2 px-3 py-2 border border-slate-200 rounded-md text-sm font-medium text-slate-700 hover:bg-slate-50 bg-white">Export Word</button></div></div></div>
+          <div class="bg-white rounded-lg border border-slate-200 shadow-sm"><div class="px-6 py-4 border-b border-slate-200"><h3 class="text-lg font-semibold text-slate-900">Grant Impact Summary</h3></div><div class="p-6"><div class="grid grid-cols-5 gap-6">
+            <div class="p-4 bg-slate-50 rounded-lg border border-slate-200"><div class="text-xs text-slate-600 uppercase tracking-wide mb-1">Total Citations</div><div class="text-2xl font-semibold text-slate-900">180</div><span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-600 text-white mt-2">+21.4%</span></div>
+            <div class="p-4 bg-slate-50 rounded-lg border border-slate-200"><div class="text-xs text-slate-600 uppercase tracking-wide mb-1">Social Reach</div><div class="text-2xl font-semibold text-slate-900">47.2K</div><div class="text-xs text-slate-500 mt-2">Unique users</div></div>
+            <div class="p-4 bg-slate-50 rounded-lg border border-slate-200"><div class="text-xs text-slate-600 uppercase tracking-wide mb-1">Media Reach</div><div class="text-2xl font-semibold text-slate-900">12.4K</div><div class="text-xs text-slate-500 mt-2">Professionals</div></div>
+            <div class="p-4 bg-slate-50 rounded-lg border border-slate-200"><div class="text-xs text-slate-600 uppercase tracking-wide mb-1">Policy Mentions</div><div class="text-2xl font-semibold text-slate-900">3</div><div class="text-xs text-slate-500 mt-2">Documents</div></div>
+            <div class="p-4 bg-slate-50 rounded-lg border border-slate-200"><div class="text-xs text-slate-600 uppercase tracking-wide mb-1">Platforms</div><div class="text-2xl font-semibold text-slate-900">6</div><div class="text-xs text-slate-500 mt-2">Active</div></div>
+          </div></div></div>
+          <div class="bg-white rounded-lg border border-slate-200 shadow-sm"><div class="px-6 py-4 border-b border-slate-200"><h3 class="text-lg font-semibold text-slate-900">Broader Impact Narrative</h3></div><div class="p-6"><div class="text-sm text-slate-700 leading-relaxed" style="white-space:pre-line">This research has demonstrated significant broader impact across multiple dimensions during the reporting period (Q4 2025 - Q1 2026).
+
+<b>Scholarly Impact:</b>
+The work has accumulated 180 citations in Google Scholar, representing a 21.4% growth rate over the six-month period.
+
+<b>Public Engagement:</b>
+Through strategic dissemination across multiple platforms, the research reached an audience of over 47,200 individuals, with documented engagement from:
+- 12,400+ unique readers across blog and Medium posts
+- 3,200+ social media interactions (likes, shares, comments)
+- 890+ in-depth technical discussions on Reddit and academic forums
+
+<b>Policy and Media Impact:</b>
+The research has been referenced in 3 policy documents related to AI infrastructure and energy efficiency standards.
+
+<b>Broader Societal Impact:</b>
+The platform-optimized dissemination strategy successfully translated complex technical contributions into accessible content for diverse audiences.</div></div></div>
+          <div class="bg-white rounded-lg border border-slate-200 shadow-sm"><div class="px-6 py-4 border-b border-slate-200"><h3 class="text-lg font-semibold text-slate-900">Key Performance Indicators</h3></div><div class="p-6"><div class="grid grid-cols-4 gap-4">
+            <div class="p-4 border border-slate-200 rounded-lg"><div class="text-xs text-slate-600 uppercase tracking-wide mb-2">Citation Velocity</div><div class="text-2xl font-semibold text-slate-900 mb-1">3.8/month</div><span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-600 text-white">+18%</span></div>
+            <div class="p-4 border border-slate-200 rounded-lg"><div class="text-xs text-slate-600 uppercase tracking-wide mb-2">H-Index Impact</div><div class="text-2xl font-semibold text-slate-900 mb-1">+2</div><span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-600 text-white">Improved</span></div>
+            <div class="p-4 border border-slate-200 rounded-lg"><div class="text-xs text-slate-600 uppercase tracking-wide mb-2">Engagement Rate</div><div class="text-2xl font-semibold text-slate-900 mb-1">6.9%</div><span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-600 text-white">+31%</span></div>
+            <div class="p-4 border border-slate-200 rounded-lg"><div class="text-xs text-slate-600 uppercase tracking-wide mb-2">Cross-Platform Reach</div><div class="text-2xl font-semibold text-slate-900 mb-1">6 platforms</div><span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-600 text-white">Active</span></div>
+          </div></div></div>
+        </div>
+        <div id="report-templates" class="bg-white rounded-lg border border-slate-200 shadow-sm"><div class="px-6 py-4 border-b border-slate-200"><h3 class="text-lg font-semibold text-slate-900">Report Templates Information</h3></div><div class="p-6"><div class="grid grid-cols-3 gap-6 text-sm">
+          <div><h4 class="font-semibold text-slate-900 mb-2">📊 Data-Driven</h4><p class="text-slate-600">All reports are automatically generated from your analytics data with real-time metrics and verified citations.</p></div>
+          <div><h4 class="font-semibold text-slate-900 mb-2">✏️ Customizable</h4><p class="text-slate-600">Export to Word or PDF format and customize the narrative to match your specific requirements and audience.</p></div>
+          <div><h4 class="font-semibold text-slate-900 mb-2">🔄 Always Current</h4><p class="text-slate-600">Reports pull the latest data at generation time, ensuring your impact metrics are always up-to-date.</p></div>
+        </div></div></div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+const papers = [
+  { id:1, title:"Neural Architecture Search for Efficient Computer Vision Models", authors:"Sarah Mitchell, John Chen, Emily Rodriguez", journal:"Nature Machine Intelligence", year:2026, doi:"10.1038/s42256-026-00123-4", status:"Published", citations:156, platforms:["Twitter","Reddit","Blog"], lastUpdated:"2 hours ago", views:12847, engagement:892 },
+  { id:2, title:"Quantum-Inspired Algorithms for Large-Scale Optimization Problems", authors:"Sarah Mitchell, David Park, Lisa Wang", journal:"Science Advances", year:2025, doi:"10.1126/sciadv.2025.00456", status:"Published", citations:342, platforms:["Twitter","Reddit","LinkedIn","Blog"], lastUpdated:"1 day ago", views:28934, engagement:1847 },
+  { id:3, title:"Federated Learning with Differential Privacy: A Comprehensive Framework", authors:"Sarah Mitchell, Michael Zhang, Anna Kim, Robert Liu", journal:"IEEE Transactions on Neural Networks", year:2025, doi:"10.1109/TNNLS.2025.1234567", status:"Published", citations:489, platforms:["Twitter","Reddit","Medium","Blog"], lastUpdated:"3 days ago", views:34562, engagement:2341 },
+  { id:4, title:"Interpretable AI for Healthcare: Methods and Clinical Applications", authors:"Sarah Mitchell, Jennifer Lee, Thomas Brown", journal:"The Lancet Digital Health", year:2025, doi:"10.1016/S2589-7500(25)00089-X", status:"Published", citations:623, platforms:["Twitter","LinkedIn","Blog","\u5c0f\u7ea2\u4e66"], lastUpdated:"1 week ago", views:45123, engagement:3456 },
+  { id:5, title:"Energy-Efficient Deep Learning: Hardware-Software Co-Design Approaches", authors:"Sarah Mitchell, Kevin Wu, Maria Garcia", journal:"ACM Computing Surveys", year:2024, doi:"10.1145/3614567", status:"Published", citations:812, platforms:["Twitter","Reddit","Blog"], lastUpdated:"2 weeks ago", views:52341, engagement:4123 },
+  { id:6, title:"Adversarial Robustness in Real-World Machine Learning Systems", authors:"Sarah Mitchell, Alex Johnson", journal:"NeurIPS 2024 Proceedings", year:2024, doi:"10.48550/arXiv.2024.09876", status:"Published", citations:425, platforms:["Twitter","Reddit"], lastUpdated:"1 month ago", views:38947, engagement:2876 },
+  { id:7, title:"Multi-Modal Learning for Autonomous Systems: A Survey", authors:"Sarah Mitchell, Christopher Davis, Sophia Martinez, James Wilson", journal:"IEEE Transactions on PAMI", year:2024, doi:"10.1109/TPAMI.2024.3456789", status:"Published", citations:0, platforms:[], lastUpdated:"Just now", views:0, engagement:0 },
+  { id:8, title:"Causal Inference in Complex Systems: Theory and Practice", authors:"Sarah Mitchell, Daniel Kim, Rachel Green", journal:"Journal of Machine Learning Research", year:2024, doi:"10.5555/3648699.3648823", status:"Under Review", citations:0, platforms:[], lastUpdated:"3 days ago", views:0, engagement:0 }
+];
+
+const platformDefs = [
+  { id:"twitter", name:"Twitter/X", icon:"\ud835\udd4f", color:"bg-black", description:"Short, engaging tweet with hashtags", maxLength:280 },
+  { id:"reddit", name:"Reddit", icon:"\ud83e\udd16", color:"bg-orange-600", description:"Detailed post for academic subreddits", maxLength:40000 },
+  { id:"linkedin", name:"LinkedIn", icon:"\ud83d\udcbc", color:"bg-blue-700", description:"Professional post highlighting impact", maxLength:3000 },
+  { id:"xiaohongshu", name:"\u5c0f\u7ea2\u4e66", icon:"\ud83d\udcd5", color:"bg-red-600", description:"\u4e2d\u6587\u79d1\u666e\u5185\u5bb9\uff0c\u9002\u5408\u5927\u4f17\u4f20\u64ad", maxLength:1000 },
+  { id:"blog", name:"Blog Post", icon:"\ud83d\udcdd", color:"bg-indigo-600", description:"Long-form article with details", maxLength:10000 },
+  { id:"medium", name:"Medium", icon:"\u24c2\ufe0f", color:"bg-slate-900", description:"Thought leadership article", maxLength:10000 }
+];
+
+const mockContent = {
+  twitter: "\ud83d\ude80 Excited to share our latest work on Neural Architecture Search for efficient CV models!\n\nWe achieved 47% reduction in computational complexity while maintaining 99.2% accuracy on ImageNet.\n\nKey innovations:\n\u2022 Hardware-aware NAS framework\n\u2022 Novel pruning strategies\n\u2022 Cross-platform optimization\n\n#MachineLearning #ComputerVision #AI",
+  reddit: "**[R] Neural Architecture Search for Efficient Computer Vision Models**\n\nHi r/MachineLearning! Our paper in Nature Machine Intelligence:\n\n**TL;DR:** Hardware-aware NAS that reduces complexity by 47% while maintaining accuracy.\n\n**Key Results:**\n- 47% reduction in FLOPs vs EfficientNet-B3\n- 99.2% ImageNet top-1 accuracy\n- 3.2x faster on Raspberry Pi 4\n- 5.8x energy efficiency improvement\n\nDOI: 10.1038/s42256-026-00123-4\n\nHappy to answer questions!",
+  linkedin: "Thrilled to announce our research on Neural Architecture Search has been published in Nature Machine Intelligence! \ud83c\udf89\n\n\u2713 47% reduction in computational complexity\n\u2713 99.2% accuracy on ImageNet\n\u2713 3.2x faster on edge devices\n\u2713 5.8x energy efficiency improvement\n\nProud to contribute to making AI more sustainable and accessible! \ud83c\udf31\n\n#ArtificialIntelligence #MachineLearning #Research",
+  xiaohongshu: "\ud83d\udd25 \u91cd\u78c5\uff01MIT\u6700\u65b0AI\u7814\u7a76\u6210\u679c\u53d1\u5e03 \ud83c\udf93\n\n\u3010\u7814\u7a76\u4eae\u70b9\u3011\n\ud83d\udcf1 \u624b\u673a\u4e0a\u8fd0\u884c\u901f\u5ea6\u63d0\u53873.2\u500d\n\u26a1\ufe0f \u8ba1\u7b97\u91cf\u51cf\u5c1147%\n\ud83c\udfaf \u51c6\u786e\u7387\u4fdd\u630199.2%\n\ud83c\udf31 \u80fd\u8017\u964d\u4f4e5.8\u500d\n\n\u8fd9\u610f\u5473\u7740\u624b\u673a\u4e0a\u53ef\u4ee5\u5b9e\u65f6\u8fd0\u884c\u66f4\u5f3a\u5927\u7684AI\u89c6\u89c9\u529f\u80fd\uff01\n\n#\u4eba\u5de5\u667a\u80fd #\u673a\u5668\u5b66\u4e60 #MIT",
+  blog: "# Neural Architecture Search for Efficient Computer Vision\n\nOur latest research addresses the deployment gap between high-performance models and edge devices.\n\n## Key Results\n- 47% reduction in FLOPs\n- 99.2% ImageNet accuracy\n- 3.2x faster inference on Raspberry Pi 4\n- 5.8x energy efficiency improvement\n\nDOI: 10.1038/s42256-026-00123-4",
+  medium: "# The Future of Edge AI\n\nThe real revolution in AI is happening at the edge. Our framework considers inference speed, energy efficiency, memory, and cross-platform performance.\n\n## Results\n- 47% fewer computations, 99.2% accuracy\n- 3.2x faster on Raspberry Pi 4\n- 5.8x more energy efficient\n\n\u2014 Dr. Sarah Mitchell, MIT"
+};
+
+let generatedContent = {};
+
+// Routing
+function navigate() {
+  const hash = location.hash.slice(1) || 'dashboard';
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  if (hash === 'dashboard' || hash === '') {
+    document.getElementById('page-dashboard').classList.add('active');
+  } else if (hash === 'global-impact') {
+    document.getElementById('page-global-impact').classList.add('active');
+  } else if (hash.startsWith('project/')) {
+    const id = parseInt(hash.split('/')[1]);
+    showProject(id);
+    document.getElementById('page-project').classList.add('active');
+  }
+  window.scrollTo(0, 0);
+}
+window.addEventListener('hashchange', navigate);
+
+function renderPapers() {
+  const c = document.getElementById('papers-list');
+  c.innerHTML = papers.map(p => `
+    <a href="#project/${p.id}" class="block">
+      <div class="bg-white rounded-lg border border-slate-200 shadow-sm hover:border-indigo-300 hover:shadow-md transition-all cursor-pointer">
+        <div class="pt-6 px-6 pb-6">
+          <div class="flex items-start justify-between gap-6">
+            <div class="flex-1"><div class="flex items-start gap-3">
+              <svg class="w-5 h-5 text-indigo-600 mt-1 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+              <div class="flex-1"><h4 class="font-semibold text-slate-900 mb-2 leading-tight">${p.title}</h4><p class="text-sm text-slate-600 mb-3">${p.authors}</p><div class="flex items-center gap-4 text-sm text-slate-500"><span class="font-medium">${p.journal}</span><span>\u00b7</span><span>${p.year}</span><span>\u00b7</span><span class="font-mono text-xs">${p.doi}</span></div></div>
+            </div></div>
+            <div class="flex items-start gap-6">
+              <div class="text-right"><span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${p.status==='Published'?'bg-green-600':'bg-yellow-600'} text-white">${p.status}</span><div class="text-xs text-slate-500 mt-2">Updated ${p.lastUpdated}</div></div>
+              <div class="flex gap-6">
+                <div class="text-center"><div class="text-2xl font-semibold text-slate-900">${p.citations}</div><div class="text-xs text-slate-600 uppercase tracking-wide">Citations</div></div>
+                <div class="text-center"><div class="text-2xl font-semibold text-slate-900">${p.views.toLocaleString()}</div><div class="text-xs text-slate-600 uppercase tracking-wide">Views</div></div>
+                <div class="text-center"><div class="text-2xl font-semibold text-slate-900">${p.engagement.toLocaleString()}</div><div class="text-xs text-slate-600 uppercase tracking-wide">Engagement</div></div>
+              </div>
+              <div class="min-w-[120px]"><div class="text-xs text-slate-600 uppercase tracking-wide mb-2">Platforms</div><div class="flex flex-wrap gap-1">${p.platforms.length>0?p.platforms.map(pl=>`<span class="inline-flex items-center border border-slate-200 rounded-full px-2 py-0.5 text-xs font-medium text-slate-700">${pl}</span>`).join(''):'<span class="text-xs text-slate-400 italic">No content yet</span>'}</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </a>`).join('');
+}
+
+function showProject(id) {
+  const paper = papers.find(p => p.id === id) || papers[0];
+  document.getElementById('project-badge').textContent = 'Project #' + paper.id;
+  // Update prev/next button states
+  const idx = papers.findIndex(p => p.id === id);
+  document.getElementById('prev-project-btn').disabled = (idx <= 0);
+  document.getElementById('prev-project-btn').style.opacity = (idx <= 0) ? '0.4' : '1';
+  document.getElementById('prev-project-btn').style.pointerEvents = (idx <= 0) ? 'none' : 'auto';
+  document.getElementById('next-project-btn').disabled = (idx >= papers.length - 1);
+  document.getElementById('next-project-btn').style.opacity = (idx >= papers.length - 1) ? '0.4' : '1';
+  document.getElementById('next-project-btn').style.pointerEvents = (idx >= papers.length - 1) ? 'none' : 'auto';
+  document.getElementById('project-title').textContent = paper.title;
+  document.getElementById('project-authors').textContent = paper.authors;
+  document.getElementById('project-journal').textContent = paper.journal;
+  document.getElementById('project-year').textContent = paper.year;
+  document.getElementById('project-doi').textContent = paper.doi;
+  generatedContent = {};
+  renderPlatformCards();
+  document.querySelectorAll('.project-nav-btn').forEach((btn, i) => {
+    if (i === 0) { btn.className = 'project-nav-btn flex items-center gap-2 px-4 py-3 rounded-lg border-2 transition-all bg-indigo-50 border-indigo-600 text-indigo-900'; btn.querySelector('.text-xs').className = 'text-xs text-indigo-700'; }
+    else { btn.className = 'project-nav-btn flex items-center gap-2 px-4 py-3 rounded-lg border-2 transition-all bg-white border-slate-200 text-slate-600 hover:border-slate-300'; btn.querySelector('.text-xs').className = 'text-xs text-slate-500'; }
+  });
+  document.querySelectorAll('#page-project main > .tab-content').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-content-generation').classList.add('active');
+  document.getElementById('report-output').classList.add('hidden');
+  document.getElementById('report-templates').classList.remove('hidden');
+  document.getElementById('generate-report-btn').classList.remove('hidden');
+}
+
+function renderPlatformCards() {
+  const grid = document.getElementById('platforms-grid');
+  grid.innerHTML = platformDefs.map(p => `
+    <div class="bg-white rounded-lg border border-slate-200 shadow-sm overflow-hidden">
+      <div class="px-6 py-4 border-b border-slate-200"><div class="flex items-center justify-between"><div class="flex items-center gap-3"><div class="w-10 h-10 rounded-lg ${p.color} flex items-center justify-center text-xl text-white">${p.icon}</div><div><div class="font-semibold text-slate-900">${p.name}</div><div class="text-xs text-slate-500 mt-0.5">${p.description}</div></div></div><span class="inline-flex items-center border border-slate-200 rounded-full px-3 py-1 text-xs font-medium text-slate-700">Max: ${p.maxLength}</span></div></div>
+      <div class="p-6" id="platform-content-${p.id}">
+        <div class="text-center py-12"><div class="w-16 h-16 rounded-full ${p.color} opacity-10 mx-auto mb-4"></div><p class="text-sm text-slate-500 mb-4">No content generated yet</p><button onclick="generateContent('${p.id}')" class="inline-flex items-center gap-2 px-3 py-2 border border-slate-200 rounded-md text-sm font-medium text-slate-700 hover:bg-slate-50">Generate Content</button></div>
+      </div>
+    </div>`).join('');
+}
+
+function generateContent(pid) {
+  const el = document.getElementById('platform-content-' + pid);
+  const p = platformDefs.find(x => x.id === pid);
+  const content = mockContent[pid];
+  generatedContent[pid] = content;
+  el.innerHTML = `<div class="space-y-3"><textarea class="w-full min-h-[200px] text-sm font-mono p-3 border border-slate-200 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500" id="textarea-${pid}">${content}</textarea><div class="flex items-center justify-between"><span class="text-xs text-slate-500">${content.length} / ${p.maxLength} characters</span><div class="flex gap-2"><button onclick="copyContent('${pid}')" id="copy-btn-${pid}" class="inline-flex items-center gap-2 px-3 py-1.5 border border-slate-200 rounded-md text-sm font-medium text-slate-700 hover:bg-slate-50">Copy</button><button onclick="generateContent('${pid}')" class="inline-flex items-center gap-2 px-3 py-1.5 border border-slate-200 rounded-md text-sm font-medium text-slate-700 hover:bg-slate-50">Regenerate</button></div></div></div>`;
+}
+
+function generateAllContent() { platformDefs.forEach(p => generateContent(p.id)); }
+
+function copyContent(pid) {
+  const ta = document.getElementById('textarea-' + pid);
+  if (ta) { navigator.clipboard.writeText(ta.value).then(() => { const btn = document.getElementById('copy-btn-' + pid); btn.textContent = 'Copied!'; setTimeout(() => { btn.textContent = 'Copy'; }, 2000); }); }
+}
+
+function generateReport() {
+  document.getElementById('report-output').classList.remove('hidden');
+  document.getElementById('report-templates').classList.add('hidden');
+  document.getElementById('generate-report-btn').classList.add('hidden');
+}
+
+// Tab switching - Project
+document.querySelectorAll('.project-nav-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.project-nav-btn').forEach(b => { b.className = 'project-nav-btn flex items-center gap-2 px-4 py-3 rounded-lg border-2 transition-all bg-white border-slate-200 text-slate-600 hover:border-slate-300'; b.querySelector('.text-xs').className = 'text-xs text-slate-500'; });
+    btn.className = 'project-nav-btn flex items-center gap-2 px-4 py-3 rounded-lg border-2 transition-all bg-indigo-50 border-indigo-600 text-indigo-900';
+    btn.querySelector('.text-xs').className = 'text-xs text-indigo-700';
+    document.querySelectorAll('#page-project main > .tab-content').forEach(t => t.classList.remove('active'));
+    document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+  });
+});
+
+// Tab switching - Global Impact
+document.querySelectorAll('.gi-tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.gi-tab-btn').forEach(b => { b.className = 'gi-tab-btn px-4 py-2 text-sm font-medium rounded-md text-slate-600 hover:text-slate-900'; });
+    btn.className = 'gi-tab-btn px-4 py-2 text-sm font-medium rounded-md bg-white shadow-sm text-slate-900';
+    document.querySelectorAll('#page-global-impact .tab-content').forEach(t => t.classList.remove('active'));
+    document.getElementById(btn.dataset.tab).classList.add('active');
+  });
+});
+
+// Report type buttons
+document.querySelectorAll('.report-type-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.report-type-btn').forEach(b => { b.className = 'report-type-btn p-4 rounded-lg border-2 text-left transition-all border-slate-200 bg-white hover:border-slate-300'; b.querySelector('.text-sm').className = 'text-sm font-medium mb-1 text-slate-900'; b.querySelector('.text-xs').className = 'text-xs text-slate-500'; });
+    btn.className = 'report-type-btn p-4 rounded-lg border-2 text-left transition-all border-indigo-600 bg-indigo-50';
+    btn.querySelector('.text-sm').className = 'text-sm font-medium mb-1 text-indigo-900';
+    btn.querySelector('.text-xs').className = 'text-xs text-indigo-700';
+  });
+});
+
+function navigateProject(dir) {
+  const hash = location.hash.slice(1);
+  if (!hash.startsWith('project/')) return;
+  const currentId = parseInt(hash.split('/')[1]);
+  const idx = papers.findIndex(p => p.id === currentId);
+  const newIdx = idx + dir;
+  if (newIdx >= 0 && newIdx < papers.length) {
+    location.hash = 'project/' + papers[newIdx].id;
+  }
+}
+
+// Keyboard navigation: left/right arrow keys
+document.addEventListener('keydown', function(e) {
+  if (e.target.tagName === 'TEXTAREA' || e.target.tagName === 'INPUT') return;
+  const hash = location.hash.slice(1);
+  if (!hash.startsWith('project/')) return;
+  if (e.key === 'ArrowLeft') navigateProject(-1);
+  if (e.key === 'ArrowRight') navigateProject(1);
+});
+
+// Import tab switching
+document.querySelectorAll('.import-tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.import-tab-btn').forEach(b => { b.className = 'import-tab-btn flex-1 px-3 py-2 text-sm font-medium rounded-md text-slate-600'; });
+    btn.className = 'import-tab-btn flex-1 px-3 py-2 text-sm font-medium rounded-md bg-white shadow-sm text-slate-900';
+    document.querySelectorAll('.import-tab-content').forEach(t => t.classList.add('hidden'));
+    document.getElementById(btn.dataset.tab).classList.remove('hidden');
+  });
+});
+
+function handleFileSelect(input) {
+  const nameEl = document.getElementById('upload-file-name');
+  if (input.files && input.files[0]) {
+    nameEl.textContent = input.files[0].name;
+    nameEl.classList.remove('hidden');
+  } else {
+    nameEl.classList.add('hidden');
+  }
+}
+
+function importPaper(type) {
+  let valid = false;
+  if (type === 'arxiv') { valid = document.getElementById('arxiv-input').value.trim().length > 0; }
+  else if (type === 'doi') { valid = document.getElementById('doi-input').value.trim().length > 0; }
+  else if (type === 'upload') { valid = document.getElementById('pdf-file-input').files.length > 0; }
+  if (!valid) { return; }
+  const msg = document.getElementById('import-success');
+  const txt = document.getElementById('import-success-text');
+  if (type === 'arxiv') txt.textContent = 'Paper imported from arXiv: ' + document.getElementById('arxiv-input').value.trim();
+  else if (type === 'doi') txt.textContent = 'Paper imported from DOI: ' + document.getElementById('doi-input').value.trim();
+  else txt.textContent = 'PDF uploaded: ' + document.getElementById('pdf-file-input').files[0].name;
+  msg.classList.remove('hidden');
+  setTimeout(() => {
+    document.getElementById('add-paper-dialog').classList.add('hidden');
+    msg.classList.add('hidden');
+    document.getElementById('arxiv-input').value = '';
+    document.getElementById('doi-input').value = '';
+    document.getElementById('upload-file-name').classList.add('hidden');
+    document.getElementById('pdf-file-input').value = '';
+  }, 1500);
+}
+
+renderPapers();
+navigate();
+</script>
+</body>
+</html>
